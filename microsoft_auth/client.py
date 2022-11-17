@@ -145,6 +145,7 @@ class MicrosoftClient(OAuth2Session):
 
                 return self.get_claims(allow_refresh=False)
             else:
+                assert False, "could not find public key for id_token"
                 logger.warn("could not find public key for id_token")
                 return None
 
@@ -159,6 +160,7 @@ class MicrosoftClient(OAuth2Session):
             )
         except jwt.PyJWTError as e:
             logger.warn("could not verify id_token sig: {}".format(e))
+            raise
             return None
 
         return claims
