@@ -41,7 +41,8 @@ class MicrosoftAuthenticationBackend(ModelBackend):
         if code is not None:
             # fetch OAuth token
             token = self.microsoft.fetch_token(code=code)
-
+            assert 'access_token' in token, repr(token)
+            assert self.microsoft.valid_scopes(token["scope"]), repr(token)
             # validate permission scopes
             if "access_token" in token and self.microsoft.valid_scopes(token["scope"]):
                 user = self._authenticate_user()
@@ -67,6 +68,8 @@ class MicrosoftAuthenticationBackend(ModelBackend):
 
     def _authenticate_microsoft_user(self):
         claims = self.microsoft.get_claims()
+
+        assert claims is not None
 
         if claims is not None:
             return self._get_user_from_microsoft(claims)
@@ -123,6 +126,8 @@ class MicrosoftAuthenticationBackend(ModelBackend):
         a new one from Xbox Live profile data"""
         user = None
         microsoft_user = self._get_microsoft_user(data)
+
+        assert microsoft_user is not None
 
         if microsoft_user is not None:
             user = self._verify_microsoft_user(microsoft_user, data)
